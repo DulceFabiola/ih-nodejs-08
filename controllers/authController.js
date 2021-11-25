@@ -50,7 +50,7 @@ exports.register = async (req, res) => {
     });
 
     //redireccion de usuario
-    res.redirect("/");
+    res.redirect("/auth/login");
   } catch (error) {
     console.log(error);
     //Seccion de errores
@@ -60,4 +60,67 @@ exports.register = async (req, res) => {
         "Hubo un error con la validacion de tu correo. Intenta nuevamente, nod ejes espacios, usa minusculas ",
     });
   }
+};
+
+exports.viewLogin = async (req, res) => {
+  res.render("auth/login");
+};
+
+exports.login = async (req, res) => {
+  try {
+    // 1. OBTENCIÓN DE DATOS DEL FORMULARIO
+    const email = req.body.email;
+    const password = req.body.password;
+
+    // 2. VALIDACIÓN DE USUARIO ENCONTRADO EN BD
+    //metodo findOne devulve la primer coincidencia y termina la busqueda
+    const foundUser = await User.findOne({ email });
+    if (!foundUser) {
+      res.render("auth/login", {
+        errorMessage: "Email o contraseña sin coincidencia.",
+      });
+      return;
+    }
+
+    // 3. VALIDACIÓN DE CONTRASEÑA
+
+    const verifiedPass = await bcryptjs.compareSync(
+      password,
+      foundUser.passwordEncriptado
+    );
+
+    if (!verifiedPass) {
+      res.render("auth/login", {
+        errorMessage: "Email o contraseña errónea. Intenta nuevamente.",
+      });
+
+      return;
+    }
+
+    // 4. (PRÓXIMAMENTE) GENERAR LA SESIÓN
+    //PERSISTENCIA DE IDENTIDAD
+    req.session.currentUser = {
+      _id: foundUser._id,
+      username: foundUser.username,
+      email: foundUser.email,
+      mensaje: "LO LOGRAMOS CARAJO",
+    };
+    // 5. REDIRECCIONAR AL HOME
+    res.redirect("/users/profile");
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+//cerrar sesion
+exports.logout = async (req, res) => {
+  res.clearCookie("session-token");
+  req.session.destroy((err) => {
+    if (err) {
+      console.log(err);
+      return next(err);
+    }
+
+    res.redirect("/");
+  });
 };
