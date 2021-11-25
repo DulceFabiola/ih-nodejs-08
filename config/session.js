@@ -24,7 +24,7 @@ const sessionManager = (app) => {
         maxAge: 86400000, // 1 milisegundo. 1000*60*60*24 => 24 Horas
       },
       store: MongoStore.create({
-        mongoUrl: process.env.MONGODB_URI,
+        mongoUrl: process.env.MONGODB_URI, //gestiona la copia de la data en MongoDB a traves de una coleccion llamada sesiones
       }),
     })
   );

@@ -13,13 +13,10 @@ router.get(
 
 //ENVIAR DATOS A LA DB QUE VIENENE DEL FORMULARIO
 router.post("/signup", routeGuard.usuarioNoLoggeado, authController.register);
-module.exports = router;
 
 // INICIAR SESIÓN
 // A. MOSTRAR EL FORMULARIO
 router.get("/login", routeGuard.usuarioNoLoggeado, authController.viewLogin);
-
-module.exports = router;
 
 //B MANEJO DEL FORMULARIO
 router.post("/login", routeGuard.usuarioNoLoggeado, authController.login);
